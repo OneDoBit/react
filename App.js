@@ -1,10 +1,48 @@
 import React from 'react';
-import { Vibration, Button, StyleSheet, Text, View } from 'react-native';
+import {Easing, Animated, TextInput, Platform, NativeModules, Vibration, Button, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import Adobe from './adobe'
 
+// Note that in order to get this to work on Android you need to set the following flags via UIManager:
+const { UIManager } = NativeModules;
+if (Platform.OS === 'android') 
+{
+    if (UIManager.setLayoutAnimationEnabledExperimental) 
+    {
+        UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
+}
+
 export default class App extends React.Component {
-    
+
+    text1 = new Animated.Value(0)
+    secondary = new Animated.Value(0)
+    third = new Animated.Value(0)
+    scale = new Animated.Value(0)
+
+
+    componentDidMount() {
+
+        Animated.timing(this.text1,{
+            toValue: 1,
+            duration: 1000,
+            easing: Easing.bounce
+        }).start()
+
+        Animated.timing(this.secondary,{
+            toValue: 1,
+            duration: 1000,
+            easing: Easing.bezier(0.645, 0.045, 0.355, 1)
+         }).start();
+
+         Animated.timing(this.third,{
+            toValue: 1,
+            duration: 1000,
+            delay: 500,
+            easing: Easing.cubic
+         }).start();
+    }
+
     render(){
         const adobes = [
             {
@@ -32,26 +70,49 @@ export default class App extends React.Component {
           {
           
               adobes.map(( adobe, index) =>
-                <Adobe 
-                key={index}
-                lowerPart={adobe.lowerPart}
-                upperPart={adobe.upperPart}
-                smallThing={adobe.smallThing}
-                letters={adobe.letters}>
-                </Adobe>
+                <Animated.View key={index} style={{...styles.h1, opacity: this.text1,
+                    transform: [{
+                        scaleX: this.text1.interpolate({
+                            inputRange:[0,1],
+                            outputRange:[0,1]
+                        })
+                    },{
+                        scaleY: this.text1.interpolate({
+                            inputRange:[0,1],
+                            outputRange: [0,1]
+                        })
+                    }]
+                }}>
+                    <Adobe 
+                    key={index}
+                    lowerPart={adobe.lowerPart}
+                    upperPart={adobe.upperPart}
+                    smallThing={adobe.smallThing}
+                    letters={adobe.letters}
+                    >
+                    </Adobe>
+                </Animated.View>
                 )
+            }
           
-          }
-          
-          <Text style={styles.title}>Your passion</Text>
-          <Text style={styles.secondary}>is our passion</Text>
-
-            <Button color="orange" onPress={() => 
-            {
-                alert('You downloaded illustrator');
-            }}
-                title="Download Illustartor now"
-            />
+        <Animated.Text style={{...styles.title, opacity:this.secondary}}>Your passion</Animated.Text>
+        <Animated.Text style={{...styles.secondary, opacity:this.third}}>is our passion</Animated.Text>
+            <Animated.View style={{
+            transform: [{
+                translateY: this.secondary.interpolate({
+                    inputRange:[0,1],
+                    outputRange:[250,0]
+                })
+            }]
+        }}>
+                <Button color="orange" onPress={() => 
+                {
+                    alert('You downloaded illustrator');
+                }}
+                    title="Download Illustartor now"
+                />
+            </Animated.View>
+            
         </View>
       );
     }

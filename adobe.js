@@ -28,7 +28,8 @@ const styles = StyleSheet.create({
     adobeStyle:
     {
         padding: 0,
-        margin: 20,
+        // margin: 20,
+        marginTop: '8%',
         width: '100%',
         borderRadius: 100,
         borderWidth: 50,
